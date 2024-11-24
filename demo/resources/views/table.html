@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Item List with Pagination</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+            rel="stylesheet"
+        />
+        <style>
+            table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+            table,
+            th,
+            td {
+                border: 1px solid black;
+            }
+            th,
+            td {
+                padding: 8px;
+                text-align: left;
+            }
+            .pagination {
+                margin-top: 10px;
+            }
+            .pagination a {
+                margin: 0 5px;
+                text-decoration: none;
+                padding: 5px 10px;
+                border: 1px solid #ddd;
+                color: #333;
+            }
+            .pagination a.active {
+                background-color: #007bff;
+                color: #fff;
+                border: 1px solid #007bff;
+            }
+            .pagination .current-page {
+                margin: 0 5px;
+                padding: 5px 10px;
+                font-weight: bold;
+                color: #007bff;
+            }
+            .page-info {
+                margin-top: 10px;
+                font-weight: bold;
+            }
+            #search-input {
+                margin-bottom: 10px;
+                padding: 8px;
+                width: 100%;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+            }
+        </style>
+    </head>
+    <body>
+        <input type="text" id="search-input" placeholder="Search items..." />
+        <div id="item-table">
+            <!-- Content will be dynamically loaded here -->
+        </div>
+
+        <script>
+            $(document).ready(function () {
+                let searchQuery = ""; // To store the current search query
+                let debounceTimeout;
+
+                // Fetch initial data
+                fetchPage(1);
+
+                // Listen for search input changes
+                $("#search-input").on("input", function () {
+                    clearTimeout(debounceTimeout);
+                    searchQuery = $(this).val();
+
+                    // Use debounce to minimize requests
+                    debounceTimeout = setTimeout(() => {
+                        fetchPage(1); // Start from page 1 when searching
+                    }, 300);
+                });
+
+                // Listen for pagination clicks
+                $(document).on("click", ".pagination a", function (event) {
+                    event.preventDefault();
+                    const page = $(this).data("page");
+                    fetchPage(page);
+                });
+
+                // Fetch data (with or without a search query)
+                function fetchPage(page) {
+                    $.ajax({
+                        url: searchQuery
+                            ? `/api/search?page=${page}`
+                            : `/api/items?page=${page}`,
+                        method: "GET",
+                        data: searchQuery ? { query: searchQuery } : {},
+                        success: function (response) {
+                            renderTable(
+                                response.data,
+                                response.links,
+                                response.prev,
+                                response.next,
+                                response.backToFirst,
+                                response.lastPage,
+                                response.meta
+                            );
+                        },
+                    });
+                }
+
+                // Render the table and pagination
+                function renderTable(
+                    items,
+                    paginationLinks,
+                    prev,
+                    next,
+                    backToFirst,
+                    lastPage,
+                    meta
+                ) {
+                    let tableHtml = `
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+
+                    if (items.length === 0) {
+                        tableHtml += `
+                            <tr>
+                                <td colspan="3" style="text-align: center;">No items found</td>
+                            </tr>
+                        `;
+                    } else {
+                        items.forEach((item) => {
+                            tableHtml += `
+                                <tr>
+                                    <td>${item.id}</td>
+                                    <td>${item.name}</td>
+                                    <td>${item.description}</td>
+                                </tr>
+                            `;
+                        });
+                    }
+
+                    tableHtml += `
+                            </tbody>
+                        </table>
+                        <div class="pagination">
+                    `;
+
+                    if (backToFirst) {
+                        tableHtml += `
+                            <a href="#" data-page="${backToFirst.page}" class="back-to-first">
+                                <i class="fas fa-angle-double-left"></i> ${backToFirst.label}
+                            </a>
+                        `;
+                    }
+
+                    if (prev) {
+                        tableHtml += `
+                            <a href="#" data-page="${prev.page}" class="prev">
+                                <i class="fas fa-chevron-left"></i> ${prev.label}
+                            </a>
+                        `;
+                    }
+
+                    // Show current page (not clickable)
+                    tableHtml += `
+                        <span class="current-page">Page ${meta.current_page} of ${meta.last_page}</span>
+                    `;
+
+                    if (next) {
+                        tableHtml += `
+                            <a href="#" data-page="${next.page}" class="next">
+                                ${next.label} <i class="fas fa-chevron-right"></i>
+                            </a>
+                        `;
+                    }
+
+                    if (lastPage) {
+                        tableHtml += `
+                            <a href="#" data-page="${lastPage.page}" class="last-page">
+                                ${lastPage.label} <i class="fas fa-angle-double-right"></i>
+                            </a>
+                        `;
+                    }
+
+                    tableHtml += `
+                        </div>
+                        <div class="page-info">
+                            Total items: ${meta.total}
+                        </div>
+                    `;
+
+                    $("#item-table").html(tableHtml);
+                }
+            });
+        </script>
+    </body>
+</html>

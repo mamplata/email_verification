@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Dynamic Translations</title>
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    </head>
+    <body>
+        <p id="text-hello-world" data-key="messages.hello_world">Hello World</p>
+        <p id="text-welcome" data-key="messages.welcome">Welcome</p>
+        <p id="text-goodbye" data-key="messages.goodbye">Goodbye</p>
+        <button id="translate-btn">Translate to Tagalog</button>
+        <button id="reset-btn">Translate to English</button>
+
+        <script>
+            $(document).ready(function () {
+                function translate(locale) {
+                    // Collect all translation keys
+                    let keys = [];
+                    $("[data-key]").each(function () {
+                        keys.push($(this).data("key"));
+                    });
+
+                    // Fetch translations
+                    $.ajax({
+                        url: "/translate",
+                        method: "GET",
+                        data: {
+                            keys: keys,
+                            locale: locale, // Pass the desired locale
+                        },
+                        success: function (translations) {
+                            // Update text dynamically
+                            $("[data-key]").each(function () {
+                                const key = $(this).data("key");
+                                if (translations[key]) {
+                                    $(this).text(translations[key]);
+                                }
+                            });
+                        },
+                        error: function () {
+                            alert("Failed to load translations.");
+                        },
+                    });
+                }
+
+                // Translate to Tagalog
+                $("#translate-btn").click(function () {
+                    translate("tl");
+                });
+
+                // Translate to English
+                $("#reset-btn").click(function () {
+                    translate("en");
+                });
+            });
+        </script>
+    </body>
+</html>

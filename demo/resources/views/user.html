@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- ... existing head content ... -->
+    </head>
+    <body>
+        <div class="container">
+            <h1 class="dashboard-header">User Dashboard</h1>
+            <div id="user-info" class="user-info">
+                <!-- User information will be displayed here -->
+                <button id="get-otc-btn" class="btn btn-primary">
+                    Get OTC Code
+                </button>
+            </div>
+            <div id="loading-spinner" class="loading-spinner">
+                <!-- Loading spinner -->
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
+            <div id="error-message" class="error-message">
+                <!-- Error message will be displayed here -->
+            </div>
+        </div>
+
+        <!-- OTC Modal -->
+        <div
+            class="modal fade"
+            id="otcModal"
+            tabindex="-1"
+            role="dialog"
+            aria-labelledby="otcModalLabel"
+            aria-hidden="true"
+        >
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="otcModalLabel">
+                            Your OTC Code
+                        </h5>
+                        <button
+                            type="button"
+                            class="close"
+                            data-dismiss="modal"
+                            aria-label="Close"
+                        >
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+
+                    <!-- Modal Body -->
+                    <div class="modal-body" id="otc-modal-body">
+                        <!-- OTC code will be displayed here -->
+                    </div>
+
+                    <!-- Modal Footer -->
+                    <div class="modal-footer">
+                        <button
+                            type="button"
+                            class="btn btn-secondary"
+                            data-dismiss="modal"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Include Scripts -->
+        <!-- Include jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <!-- Include Popper.js -->
+        <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+        <!-- Include Bootstrap JS -->
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+        <!-- Custom Script -->
+        <script src="user.js"></script>
+    </body>
+</html>
