@@ -1,39 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 
-Route::get('/', function () {
-    return view('index');
+Route::get('login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('login', [AuthController::class, 'login']);
+Route::post('logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/dashboard', function () {
+    return view('dashboard');
+})->middleware('auth');
+
+Route::middleware(['role:admin'])->group(function () {
+    Route::get('/admin/dashboard', [AuthController::class, 'adminIndex'])->name('admin.dashboard')->middleware('auth');
 });
 
-Route::get('/user', function () {
-    return view('user');
-});
-
-
-Route::get('/translate-page', function () {
-    return view('translate');
-});
-
-Route::get('/translate', function () {
-    $keys = request()->input('keys', []); // Fetch keys array
-    $locale = request()->input('locale', config('app.locale')); // Get locale or use default
-
-    if (!is_array($keys)) {
-        return response()->json(['error' => 'Invalid keys format'], 400);
-    }
-
-    // Temporarily set locale
-    app()->setLocale($locale);
-
-    $translations = [];
-    foreach ($keys as $key) {
-        $translations[$key] = __($key);
-    }
-
-    return response()->json($translations);
-});
-
-Route::get('/table-page', function () {
-    return view('table');
+Route::middleware(['role:user'])->group(function () {
+    Route::get('/user/dashboard', [AuthController::class, 'userIndex'])->name('user.dashboard')->middleware('auth');
 });

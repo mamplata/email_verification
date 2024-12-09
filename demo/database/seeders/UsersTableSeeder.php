@@ -16,13 +16,29 @@ class UsersTableSeeder extends Seeder
     {
         $faker = Faker::create();
 
-        for ($i = 0; $i < 10; $i++) { // Adjust the number of users as needed
-            DB::table('users')->insert([
-                'name' => $faker->name(),
-                'password' => '1234', // Replace 'password' with a desired default password
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        }
+        // for ($i = 0; $i < 10; $i++) { // Adjust the number of users as needed
+        //     DB::table('users')->insert([
+        //         'name' => $faker->name(),
+        //         'password' => '1234', // Replace 'password' with a desired default password
+        //         'created_at' => now(),
+        //         'updated_at' => now(),
+        //     ]);
+        // }
+
+        DB::table('users')->insert([
+            'name' => 'admin',
+            'password' => Hash::make('1234'),
+            'role' => 'admin',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        DB::table('users')->insert([
+            'name' => 'user',
+            'password' => Hash::make('1234'),
+            'role' => 'user',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
     }
 }
